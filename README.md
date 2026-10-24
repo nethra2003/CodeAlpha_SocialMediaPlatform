@@ -110,10 +110,6 @@ Follow the prompts to create an administrator account.
 python manage.py runserver
 ```
 
-Open your browser and visit:
-
-- **Application:** http://127.0.0.1:8000/
-
 ## Media Files
 
 The application supports profile pictures and image/video uploads.
