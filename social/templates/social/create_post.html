@@ -1,0 +1,564 @@
+{% extends "social/base.html" %}
+
+{% block title %}Create Post | SocialConnect{% endblock %}
+
+{% block extra_css %}
+<style>
+    .create-page {
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    .create-heading {
+        margin-bottom: 25px;
+    }
+
+    .create-heading h1 {
+        font-size: 29px;
+        margin-bottom: 8px;
+        color: #202235;
+    }
+
+    .create-heading p {
+        color: #85889a;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .create-card {
+        background: white;
+        padding: 28px;
+        border: 1px solid #eaebf2;
+        border-radius: 22px;
+        box-shadow: 0 8px 30px rgba(35, 38, 80, .05);
+    }
+
+    .create-user {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #f0f0f6;
+        margin-bottom: 22px;
+    }
+
+    .create-avatar {
+        width: 50px;
+        height: 50px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #5b5fef, #8b5cf6);
+        color: white;
+        font-size: 20px;
+        font-weight: 800;
+    }
+
+    .create-user strong {
+        display: block;
+        font-size: 14px;
+        color: #202235;
+    }
+
+    .create-user span {
+        color: #85889a;
+        font-size: 12px;
+    }
+
+    .create-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #202235;
+    }
+
+    .create-textarea {
+        width: 100%;
+        box-sizing: border-box;
+        min-height: 180px;
+        resize: vertical;
+        padding: 18px;
+        background: #fafaff;
+        border: 1px solid #e1e2ed;
+        border-radius: 15px;
+        font-family: inherit;
+        font-size: 15px;
+        line-height: 1.8;
+        color: #202235;
+        outline: none;
+    }
+
+    .create-textarea:focus,
+    .media-input:focus {
+        border-color: #5b5fef;
+        box-shadow: 0 0 0 3px rgba(91, 95, 239, .1);
+        background: white;
+    }
+
+    .create-hint {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        color: #85889a;
+        font-size: 11px;
+        margin-top: 9px;
+    }
+
+    .media-section {
+        margin-top: 25px;
+    }
+
+    .media-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .media-option {
+        padding: 17px;
+        border: 1px solid #e5e4f5;
+        border-radius: 15px;
+        background: #fcfbff;
+    }
+
+    .media-option-heading {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 12px;
+        color: #383858;
+        font-size: 13px;
+        font-weight: 750;
+    }
+
+    .media-icon {
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        border-radius: 10px;
+        background: #ede9fe;
+        font-size: 18px;
+    }
+
+    .media-input {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        font-family: inherit;
+        font-size: 12px;
+        color: #62647a;
+    }
+
+    .media-help {
+        margin: 9px 0 0;
+        font-size: 11px;
+        line-height: 1.6;
+        color: #85889a;
+    }
+
+    .media-preview {
+        display: none;
+        margin-top: 20px;
+        padding: 15px;
+        border: 1px solid #e7e4fb;
+        border-radius: 15px;
+        background: #faf9ff;
+    }
+
+    .media-preview-title {
+        font-size: 12px;
+        font-weight: 750;
+        color: #5b5fef;
+        margin-bottom: 12px;
+    }
+
+    .media-preview img,
+    .media-preview video {
+        display: block;
+        width: 100%;
+        max-height: 400px;
+        object-fit: contain;
+        background: #171725;
+        border-radius: 11px;
+    }
+
+    .media-filename {
+        margin-top: 9px;
+        font-size: 12px;
+        color: #66697d;
+        overflow-wrap: anywhere;
+    }
+
+    .create-preview {
+        padding: 17px;
+        margin-top: 23px;
+        background: linear-gradient(120deg, #fafaff, #f3f0ff);
+        border: 1px solid #e9e6ff;
+        border-radius: 15px;
+    }
+
+    .create-preview-title {
+        color: #5b5fef;
+        font-size: 12px;
+        font-weight: 750;
+        margin-bottom: 7px;
+    }
+
+    .create-preview p {
+        margin: 0;
+        color: #66697d;
+        font-size: 12px;
+        line-height: 1.7;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .form-error {
+        margin-top: 8px;
+        color: #c6284b;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .form-error ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+
+    .form-error-box {
+        margin-bottom: 18px;
+        padding: 13px 15px;
+        border: 1px solid #f3c1cd;
+        border-radius: 12px;
+        background: #fff3f5;
+        color: #a51e3b;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .create-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 23px;
+        padding-top: 20px;
+        border-top: 1px solid #f0f0f6;
+    }
+
+    .create-actions-right {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .create-actions .btn,
+    .create-actions button {
+        padding: 12px 18px;
+        cursor: pointer;
+    }
+
+    .publish-button:disabled {
+        opacity: .65;
+        cursor: wait;
+    }
+
+    @media (max-width: 600px) {
+        .create-card {
+            padding: 20px;
+        }
+
+        .media-options {
+            grid-template-columns: 1fr;
+        }
+
+        .create-textarea {
+            min-height: 150px;
+        }
+
+        .create-actions {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .create-actions > a,
+        .create-actions-right,
+        .create-actions-right button {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .create-actions-right > button {
+            flex: 1;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="create-page">
+
+    <div class="create-heading">
+        <h1>Create a Post ✨</h1>
+        <p>Share your thoughts, photos, or videos with your community.</p>
+    </div>
+
+    <section class="create-card">
+
+        <div class="create-user">
+            <div class="create-avatar">
+                {{ request.user.username|first|upper }}
+            </div>
+
+            <div>
+                <strong>{{ request.user.username }}</strong>
+                <span>Sharing with your SocialConnect community</span>
+            </div>
+        </div>
+
+        <form method="POST"
+              enctype="multipart/form-data"
+              id="createPostForm">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="form-error-box">
+                    <strong>Please correct the following:</strong>
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <label for="id_content" class="create-label">
+                What's on your mind?
+            </label>
+
+            <textarea
+                id="id_content"
+                name="content"
+                class="create-textarea"
+                placeholder="Write something worth sharing..."
+                maxlength="5000"
+            >{{ form.content.value|default_if_none:"" }}</textarea>
+
+            {% if form.content.errors %}
+                <div class="form-error">{{ form.content.errors }}</div>
+            {% endif %}
+
+            <div class="create-hint">
+                <span>💜 Be kind. Share something meaningful.</span>
+                <span id="character-count">0 / 5000</span>
+            </div>
+
+            <div class="media-section">
+                <label class="create-label">Add media (optional)</label>
+
+                <div class="media-options">
+                    <div class="media-option">
+                        <div class="media-option-heading">
+                            <span class="media-icon">🖼️</span>
+                            <span>Add an image</span>
+                        </div>
+
+                        <input
+                            type="file"
+                            name="image"
+                            id="id_image"
+                            class="media-input"
+                            accept="image/jpeg,image/png,image/gif,image/webp"
+                        >
+
+                        <p class="media-help">
+                            JPG, PNG, GIF or WebP. Maximum size: 10 MB.
+                        </p>
+
+                        {% if form.image.errors %}
+                            <div class="form-error">{{ form.image.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="media-option">
+                        <div class="media-option-heading">
+                            <span class="media-icon">🎬</span>
+                            <span>Add a video</span>
+                        </div>
+
+                        <input
+                            type="file"
+                            name="video"
+                            id="id_video"
+                            class="media-input"
+                            accept="video/mp4,video/webm,video/ogg"
+                        >
+
+                        <p class="media-help">
+                            MP4, WebM or Ogg. Maximum size: 50 MB.
+                        </p>
+
+                        {% if form.video.errors %}
+                            <div class="form-error">{{ form.video.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="media-preview" id="mediaPreview">
+                    <div class="media-preview-title">MEDIA PREVIEW</div>
+                    <img id="imagePreview" alt="Selected image preview" hidden>
+                    <video id="videoPreview" controls playsinline hidden></video>
+                    <div class="media-filename" id="mediaFilename"></div>
+                </div>
+            </div>
+
+            <div class="create-preview">
+                <div class="create-preview-title">✨ POST PREVIEW</div>
+                <p id="post-preview">Your post text will appear here as you type.</p>
+            </div>
+
+            <div class="create-actions">
+                <a href="{% url 'feed' %}" class="btn btn-secondary">
+                    ← Back to Feed
+                </a>
+
+                <div class="create-actions-right">
+                    <button type="reset" class="btn btn-secondary">
+                        Clear
+                    </button>
+
+                    <button type="submit" class="publish-button" id="publishButton">
+                        Publish Post ↗
+                    </button>
+                </div>
+            </div>
+
+        </form>
+    </section>
+</div>
+
+<script>
+(function () {
+    const form = document.getElementById("createPostForm");
+    const textarea = document.getElementById("id_content");
+    const counter = document.getElementById("character-count");
+    const postPreview = document.getElementById("post-preview");
+    const imageInput = document.getElementById("id_image");
+    const videoInput = document.getElementById("id_video");
+    const mediaPreview = document.getElementById("mediaPreview");
+    const imagePreview = document.getElementById("imagePreview");
+    const videoPreview = document.getElementById("videoPreview");
+    const filename = document.getElementById("mediaFilename");
+    const publishButton = document.getElementById("publishButton");
+
+    let previewUrl = null;
+
+    function updateTextPreview() {
+        counter.textContent = textarea.value.length + " / 5000";
+        postPreview.textContent = textarea.value.trim()
+            ? textarea.value
+            : "Your post text will appear here as you type.";
+    }
+
+    function clearMediaPreview() {
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            previewUrl = null;
+        }
+
+        imagePreview.removeAttribute("src");
+        videoPreview.removeAttribute("src");
+        imagePreview.hidden = true;
+        videoPreview.hidden = true;
+        filename.textContent = "";
+        mediaPreview.style.display = "none";
+    }
+
+    function previewSelectedFile(file, type) {
+        clearMediaPreview();
+
+        if (!file) return;
+
+        const isImage = type === "image";
+        const allowedTypes = isImage
+            ? ["image/jpeg", "image/png", "image/gif", "image/webp"]
+            : ["video/mp4", "video/webm", "video/ogg"];
+
+        const maxSize = isImage
+            ? 10 * 1024 * 1024
+            : 50 * 1024 * 1024;
+
+        if (!allowedTypes.includes(file.type)) {
+            alert("Please choose a supported " + type + " file.");
+            if (isImage) imageInput.value = "";
+            else videoInput.value = "";
+            return;
+        }
+
+        if (file.size > maxSize) {
+            alert("The selected " + type + " exceeds the allowed file size.");
+            if (isImage) imageInput.value = "";
+            else videoInput.value = "";
+            return;
+        }
+
+        previewUrl = URL.createObjectURL(file);
+        mediaPreview.style.display = "block";
+        filename.textContent = file.name;
+
+        if (isImage) {
+            imagePreview.src = previewUrl;
+            imagePreview.hidden = false;
+        } else {
+            videoPreview.src = previewUrl;
+            videoPreview.hidden = false;
+        }
+    }
+
+    imageInput.addEventListener("change", function () {
+        if (this.files.length) {
+            videoInput.value = "";
+            previewSelectedFile(this.files[0], "image");
+        } else {
+            clearMediaPreview();
+        }
+    });
+
+    videoInput.addEventListener("change", function () {
+        if (this.files.length) {
+            imageInput.value = "";
+            previewSelectedFile(this.files[0], "video");
+        } else {
+            clearMediaPreview();
+        }
+    });
+
+    textarea.addEventListener("input", updateTextPreview);
+
+    form.addEventListener("reset", function () {
+        window.setTimeout(function () {
+            clearMediaPreview();
+            updateTextPreview();
+        }, 0);
+    });
+
+    form.addEventListener("submit", function (event) {
+        const hasText = textarea.value.trim().length > 0;
+        const hasImage = imageInput.files.length > 0;
+        const hasVideo = videoInput.files.length > 0;
+
+        if (!hasText && !hasImage && !hasVideo) {
+            event.preventDefault();
+            alert("Please write something or select an image or video.");
+            return;
+        }
+
+        publishButton.disabled = true;
+        publishButton.textContent = "Publishing...";
+    });
+
+    updateTextPreview();
+})();
+</script>
+{% endblock %}

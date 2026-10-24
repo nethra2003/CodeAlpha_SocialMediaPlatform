@@ -1,0 +1,422 @@
+{% extends "social/base.html" %}
+
+{% block title %}{{ profile_user.username }}'s Profile | SocialConnect{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .profile-cover {
+        height: 190px;
+        border-radius: 22px 22px 0 0;
+        background: linear-gradient(120deg, #5b5fef, #8b5cf6, #c4b5fd);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-cover::before,
+    .profile-cover::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, .12);
+    }
+
+    .profile-cover::before {
+        width: 260px;
+        height: 260px;
+        right: 12%;
+        top: -130px;
+    }
+
+    .profile-cover::after {
+        width: 180px;
+        height: 180px;
+        right: 35%;
+        bottom: -110px;
+    }
+
+    .profile-main {
+        background: #fff;
+        border: 1px solid #eaebf2;
+        border-top: 0;
+        border-radius: 0 0 20px 20px;
+        padding: 0 30px 28px;
+        box-shadow: 0 5px 24px rgba(35, 38, 80, .05);
+        margin-bottom: 26px;
+    }
+
+    .profile-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 18px;
+    }
+
+    .profile-avatar {
+        width: 118px;
+        height: 118px;
+        margin-top: -58px;
+        position: relative;
+        border: 5px solid white;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #eeedff;
+        box-shadow: 0 4px 18px rgba(35, 38, 80, .12);
+        box-sizing: border-box;
+    }
+
+    .profile-avatar-fallback {
+        display: grid;
+        place-items: center;
+        color: white;
+        background: linear-gradient(135deg, #5b5fef, #8b5cf6);
+        font-size: 42px;
+        font-weight: 800;
+    }
+
+    .profile-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 9px;
+        padding-top: 17px;
+    }
+
+    .profile-name {
+        font-size: 27px;
+        font-weight: 800;
+        margin: 14px 0 2px;
+        overflow-wrap: anywhere;
+    }
+
+    .profile-handle {
+        color: #85889a;
+        font-size: 13px;
+    }
+
+    .profile-bio {
+        margin: 18px 0;
+        color: #55586c;
+        font-size: 14px;
+        line-height: 1.8;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .profile-stats {
+        display: flex;
+        gap: 32px;
+        flex-wrap: wrap;
+        border-top: 1px solid #f0f0f6;
+        padding-top: 20px;
+        margin-top: 18px;
+    }
+
+    .profile-stat {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 70px;
+    }
+
+    .profile-stat strong {
+        font-size: 20px;
+        color: #202235;
+    }
+
+    .profile-stat span {
+        color: #85889a;
+        font-size: 12px;
+    }
+
+    .section-title {
+        font-size: 21px;
+        font-weight: 800;
+        margin: 0 0 17px;
+    }
+
+    .profile-post {
+        background: white;
+        border: 1px solid #eaebf2;
+        border-radius: 17px;
+        padding: 22px;
+        margin-bottom: 17px;
+        box-shadow: 0 5px 24px rgba(35, 38, 80, .04);
+        min-width: 0;
+    }
+
+    .profile-post-date {
+        color: #9295a6;
+        font-size: 12px;
+    }
+
+    .profile-post-content {
+        color: #45475c;
+        font-size: 14px;
+        line-height: 1.9;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        margin: 16px 0;
+    }
+
+    .profile-post-media {
+        margin: 15px 0;
+        overflow: hidden;
+        border: 1px solid #eaebf2;
+        border-radius: 13px;
+        background: #f7f7fc;
+    }
+
+    .profile-post-media img {
+        display: block;
+        width: 100%;
+        max-height: 650px;
+        object-fit: contain;
+        background: #f7f7fc;
+    }
+
+    .profile-post-media video {
+        display: block;
+        width: 100%;
+        max-height: 650px;
+        background: #171725;
+    }
+
+    .profile-post-meta {
+        color: #85889a;
+        font-size: 12px;
+        border-top: 1px solid #f0f0f6;
+        padding-top: 13px;
+        margin-top: 15px;
+    }
+
+    .profile-post-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 14px;
+    }
+
+    .profile-empty {
+        padding: 38px 22px;
+        background: white;
+        border: 1px solid #eaebf2;
+        border-radius: 17px;
+        text-align: center;
+    }
+
+    .profile-empty-icon {
+        font-size: 38px;
+        margin-bottom: 10px;
+    }
+
+    @media (max-width: 600px) {
+        .profile-cover {
+            height: 140px;
+        }
+
+        .profile-main {
+            padding: 0 18px 22px;
+        }
+
+        .profile-avatar {
+            width: 94px;
+            height: 94px;
+            margin-top: -47px;
+        }
+
+        .profile-name {
+            font-size: 23px;
+        }
+
+        .profile-top {
+            flex-wrap: wrap;
+        }
+
+        .profile-buttons {
+            padding-top: 8px;
+            justify-content: flex-start;
+        }
+
+        .profile-stats {
+            gap: 20px;
+        }
+
+        .profile-post {
+            padding: 17px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+
+    <section class="profile-cover"></section>
+
+    <section class="profile-main">
+        <div class="profile-top">
+            <div>
+                {% if profile_user.profile.profile_picture %}
+                    <img
+                        src="{{ profile_user.profile.profile_picture.url }}"
+                        alt="{{ profile_user.username }}'s profile picture"
+                        class="profile-avatar"
+                    >
+                {% else %}
+                    <div class="profile-avatar profile-avatar-fallback">
+                        {{ profile_user.username|first|upper }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="profile-buttons">
+                {% if profile_user == request.user %}
+                    <a href="{% url 'edit_profile' %}" class="btn">
+                        ✏️ Edit Profile
+                    </a>
+                    <a href="{% url 'create_post' %}" class="btn btn-secondary">
+                        ＋ Create Post
+                    </a>
+                {% else %}
+                    <form
+                        method="post"
+                        action="{% url 'toggle_follow' profile_user.username %}"
+                        style="margin:0"
+                    >
+                        {% csrf_token %}
+
+                        {% if is_following %}
+                            <button type="submit" class="btn-secondary">
+                                ✓ Following
+                            </button>
+                        {% else %}
+                            <button type="submit">
+                                ＋ Follow
+                            </button>
+                        {% endif %}
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <h1 class="profile-name">{{ profile_user.username }}</h1>
+
+        <div class="profile-handle">@{{ profile_user.username }}</div>
+
+        <div class="profile-bio">
+            {% if profile_user.profile.bio %}
+                {{ profile_user.profile.bio }}
+            {% else %}
+                <span style="color:#9295a6">
+                    This user hasn't added a bio yet.
+                </span>
+            {% endif %}
+        </div>
+
+        <div class="profile-stats">
+            <div class="profile-stat">
+                <strong>{{ profile_user.posts.count }}</strong>
+                <span>Posts</span>
+            </div>
+
+            <div class="profile-stat">
+                <strong>{{ profile_user.followers.count }}</strong>
+                <span>Followers</span>
+            </div>
+
+            <div class="profile-stat">
+                <strong>{{ profile_user.following.count }}</strong>
+                <span>Following</span>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="section-title">
+            {% if profile_user == request.user %}
+                Your Posts ✨
+            {% else %}
+                {{ profile_user.username }}'s Posts
+            {% endif %}
+        </h2>
+
+        {% for post in posts %}
+            <article class="profile-post">
+
+                <div class="profile-post-date">
+                    Posted on {{ post.created_at|date:"M d, Y" }}
+                    at {{ post.created_at|time:"g:i A" }}
+                </div>
+
+                {% if post.content %}
+                    <div class="profile-post-content">{{ post.content }}</div>
+                {% endif %}
+
+                {% if post.image %}
+                    <div class="profile-post-media">
+                        <img
+                            src="{{ post.image.url }}"
+                            alt="Image shared by {{ post.author.username }}"
+                            loading="lazy"
+                        >
+                    </div>
+                {% endif %}
+
+                {% if post.video %}
+                    <div class="profile-post-media">
+                        <video controls playsinline preload="metadata">
+                            <source src="{{ post.video.url }}">
+                            Your browser does not support video playback.
+                        </video>
+                    </div>
+                {% endif %}
+
+                <div class="profile-post-meta">
+                    💜 {{ post.likes.count }} likes
+                    &nbsp; · &nbsp;
+                    💬 {{ post.comments.count }} comments
+                </div>
+
+                {% if post.author_id == request.user.id %}
+                    <div class="profile-post-actions">
+                        <form
+                            method="post"
+                            action="{% url 'delete_post' post.id %}"
+                            onsubmit="return confirm('Delete this post?');"
+                        >
+                            {% csrf_token %}
+                            <button type="submit" class="btn-danger">
+                                🗑 Delete Post
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            </article>
+
+        {% empty %}
+            <div class="profile-empty">
+                <div class="profile-empty-icon">📝</div>
+                <h3>No posts yet</h3>
+                <p class="muted">
+                    {% if profile_user == request.user %}
+                        Share your first post with your community!
+                    {% else %}
+                        This user hasn't shared any posts yet.
+                    {% endif %}
+                </p>
+
+                {% if profile_user == request.user %}
+                    <a href="{% url 'create_post' %}" class="btn">
+                        ＋ Create Your First Post
+                    </a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </section>
+
+</div>
+{% endblock %}

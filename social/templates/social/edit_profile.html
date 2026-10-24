@@ -1,0 +1,485 @@
+{% extends "social/base.html" %}
+
+{% block title %}Edit Profile | SocialConnect{% endblock %}
+
+{% block extra_css %}
+<style>
+    .edit-profile-page {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 12px 0 40px;
+    }
+
+    .edit-header {
+        margin-bottom: 24px;
+    }
+
+    .edit-header h1 {
+        margin: 0 0 8px;
+        color: var(--text);
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.7px;
+    }
+
+    .edit-header p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .edit-card {
+        overflow: hidden;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        box-shadow: 0 10px 35px rgba(36, 38, 75, 0.06);
+    }
+
+    .edit-card-banner {
+        height: 125px;
+        background: linear-gradient(115deg, #5B5FEF, #8B5CF6, #B8A5FF);
+        position: relative;
+    }
+
+    .edit-card-banner::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 85% 15%,
+            rgba(255,255,255,.3), transparent 35%);
+    }
+
+    .edit-card-body {
+        padding: 0 32px 32px;
+    }
+
+    .avatar-section {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        margin-top: -48px;
+        margin-bottom: 30px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .avatar-preview {
+        width: 112px;
+        height: 112px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border: 5px solid #fff;
+        border-radius: 50%;
+        background: #EDE9FE;
+        color: #5B5FEF;
+        font-size: 35px;
+        font-weight: 800;
+        box-shadow: 0 4px 16px rgba(25, 25, 50, 0.12);
+    }
+
+    .avatar-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .avatar-info h2 {
+        margin: 0 0 6px;
+        font-size: 19px;
+        font-weight: 750;
+        color: var(--text);
+        overflow-wrap: anywhere;
+    }
+
+    .avatar-info p {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--muted);
+    }
+
+    .form-section-title {
+        margin: 0 0 22px;
+        font-size: 17px;
+        font-weight: 750;
+        color: var(--text);
+    }
+
+    .field-group {
+        margin-bottom: 25px;
+    }
+
+    .field-label {
+        display: block;
+        margin-bottom: 9px;
+        color: var(--text);
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .field-hint {
+        display: block;
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .edit-profile-page textarea,
+    .edit-profile-page input[type="text"],
+    .edit-profile-page input[type="file"] {
+        width: 100%;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+    .edit-profile-page textarea,
+    .edit-profile-page input[type="text"] {
+        padding: 13px 15px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: #FCFCFF;
+        color: var(--text);
+        font-size: 14px;
+        line-height: 1.6;
+        outline: none;
+        transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+
+    .edit-profile-page textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .edit-profile-page textarea:focus,
+    .edit-profile-page input[type="text"]:focus {
+        border-color: var(--primary);
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(91, 95, 239, .10);
+    }
+
+    .upload-box {
+        padding: 18px;
+        border: 1.5px dashed #D9D6FE;
+        border-radius: 14px;
+        background: #FAFAFF;
+    }
+
+    .upload-box input[type="file"] {
+        color: var(--muted);
+        font-size: 13px;
+    }
+
+    .upload-box input[type="file"]::file-selector-button {
+        margin-right: 12px;
+        padding: 9px 13px;
+        border: 0;
+        border-radius: 9px;
+        background: #EDE9FE;
+        color: #5B45C6;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .upload-box input[type="file"]::file-selector-button:hover {
+        background: #DDD6FE;
+    }
+
+    .field-error {
+        margin-top: 8px;
+        color: #C6284B;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .field-error ul {
+        margin: 0;
+        padding-left: 19px;
+    }
+
+    .form-errors {
+        margin-bottom: 24px;
+        padding: 14px 16px;
+        border: 1px solid #F5B8C5;
+        border-radius: 12px;
+        background: #FFF3F5;
+        color: #A51E3B;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .form-errors ul {
+        margin: 6px 0 0;
+        padding-left: 20px;
+    }
+
+    .edit-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 30px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+    }
+
+    .edit-actions a,
+    .edit-actions button {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 43px;
+        padding: 0 20px;
+        border-radius: 11px;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 750;
+        text-decoration: none;
+        cursor: pointer;
+        transition: transform .2s, background .2s, box-shadow .2s;
+    }
+
+    .cancel-btn {
+        border: 1px solid var(--border);
+        background: #fff;
+        color: var(--text);
+    }
+
+    .cancel-btn:hover {
+        background: #F5F5FA;
+    }
+
+    .save-btn {
+        border: none;
+        background: linear-gradient(110deg, #5B5FEF, #7955E8);
+        color: #fff;
+        box-shadow: 0 5px 13px rgba(91, 95, 239, .22);
+    }
+
+    .save-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 7px 17px rgba(91, 95, 239, .30);
+    }
+
+    .save-btn:disabled {
+        opacity: .65;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .helptext {
+        display: block;
+        margin-top: 7px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 600px) {
+        .edit-profile-page {
+            padding-top: 0;
+        }
+
+        .edit-header h1 {
+            font-size: 24px;
+        }
+
+        .edit-card-banner {
+            height: 100px;
+        }
+
+        .edit-card-body {
+            padding: 0 19px 24px;
+        }
+
+        .avatar-section {
+            gap: 14px;
+            margin-top: -38px;
+            margin-bottom: 25px;
+        }
+
+        .avatar-preview {
+            width: 88px;
+            height: 88px;
+            font-size: 28px;
+        }
+
+        .avatar-info h2 {
+            font-size: 16px;
+        }
+
+        .edit-actions {
+            flex-direction: column-reverse;
+        }
+
+        .edit-actions a,
+        .edit-actions button {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="edit-profile-page">
+
+    <div class="edit-header">
+        <h1>Edit your profile</h1>
+        <p>Update your profile picture and tell the SocialConnect community a little about yourself.</p>
+    </div>
+
+    <div class="edit-card">
+        <div class="edit-card-banner"></div>
+
+        <div class="edit-card-body">
+
+            <div class="avatar-section">
+                <div class="avatar-preview" id="avatarPreview">
+                    {% if form.instance.profile_picture %}
+                        <img
+                            id="avatarImage"
+                            src="{{ form.instance.profile_picture.url }}"
+                            alt="Current profile picture"
+                        >
+                    {% else %}
+                        <span id="avatarInitial">
+                            {{ request.user.username|first|upper }}
+                        </span>
+                        <img id="avatarImage" src="" alt="Profile picture preview" hidden>
+                    {% endif %}
+                </div>
+
+                <div class="avatar-info">
+                    <h2>{{ request.user.username }}</h2>
+                    <p>Your profile represents you across SocialConnect.</p>
+                </div>
+            </div>
+
+            <h2 class="form-section-title">Personal information</h2>
+
+            <form method="POST" enctype="multipart/form-data" id="editProfileForm" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="form-errors">
+                        <strong>Please correct the following:</strong>
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="field-group">
+                    <label class="field-label" for="{{ form.bio.id_for_label }}">
+                        About you
+                    </label>
+
+                    {{ form.bio }}
+
+                    {% if form.bio.help_text %}
+                        <span class="field-hint">{{ form.bio.help_text }}</span>
+                    {% else %}
+                        <span class="field-hint">
+                            Share your interests, background, or what you enjoy.
+                        </span>
+                    {% endif %}
+
+                    {% if form.bio.errors %}
+                        <div class="field-error">
+                            {{ form.bio.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="{{ form.profile_picture.id_for_label }}">
+                        Profile picture
+                    </label>
+
+                    <div class="upload-box">
+                        {{ form.profile_picture }}
+
+                        <span class="field-hint">
+                            Choose an image from your device. Your existing picture will remain unchanged if you don't select another one.
+                        </span>
+                    </div>
+
+                    {% if form.profile_picture.errors %}
+                        <div class="field-error">
+                            {{ form.profile_picture.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if form.errors and not form.non_field_errors %}
+                    <div class="form-errors">
+                        Some fields need your attention. Please review the error messages above.
+                    </div>
+                {% endif %}
+
+                <div class="edit-actions">
+                    <a href="{% url 'profile' %}" class="cancel-btn">
+                        Cancel
+                    </a>
+
+                    <button type="submit" class="save-btn" id="saveProfileBtn">
+                        Save Changes
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const fileInput = document.getElementById("{{ form.profile_picture.id_for_label }}");
+    const previewImage = document.getElementById("avatarImage");
+    const initial = document.getElementById("avatarInitial");
+    const form = document.getElementById("editProfileForm");
+    const saveButton = document.getElementById("saveProfileBtn");
+
+    if (fileInput && previewImage) {
+        fileInput.addEventListener("change", function () {
+            const file = this.files && this.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            if (!file.type.startsWith("image/")) {
+                alert("Please select a valid image file.");
+                this.value = "";
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                previewImage.src = event.target.result;
+                previewImage.hidden = false;
+
+                if (initial) {
+                    initial.style.display = "none";
+                }
+            };
+
+            reader.readAsDataURL(file);
+        });
+    }
+
+    if (form && saveButton) {
+        form.addEventListener("submit", function () {
+            saveButton.disabled = true;
+            saveButton.textContent = "Saving...";
+        });
+    }
+})();
+</script>
+{% endblock %}

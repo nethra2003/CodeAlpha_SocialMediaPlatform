@@ -1,0 +1,825 @@
+{% extends "social/base.html" %}
+
+{% block title %}Home Feed | SocialConnect{% endblock %}
+
+{% block extra_css %}
+<style>
+    .feed-layout {
+        display: grid;
+        grid-template-columns: 230px minmax(0, 620px) 270px;
+        gap: 24px;
+        justify-content: center;
+        align-items: start;
+    }
+
+    .feed-sidebar,
+    .feed-rightbar {
+        position: sticky;
+        top: 100px;
+    }
+
+    .sidebar-card {
+        background: #fff;
+        border: 1px solid #eaebf2;
+        border-radius: 18px;
+        padding: 20px;
+        margin-bottom: 18px;
+        box-shadow: 0 5px 24px rgba(35, 38, 80, .04);
+    }
+
+    .sidebar-title {
+        font-size: 14px;
+        font-weight: 750;
+        margin: 0 0 16px;
+    }
+
+    .side-link {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 11px 12px;
+        border-radius: 12px;
+        color: #626579;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .side-link:hover,
+    .side-link.selected {
+        background: #eeedff;
+        color: #5b5fef;
+    }
+
+    .side-icon {
+        width: 25px;
+        text-align: center;
+        font-size: 17px;
+    }
+
+    .feed-welcome {
+        padding: 24px;
+        margin-bottom: 20px;
+        background: linear-gradient(120deg, #ffffff 35%, #f0edff);
+        border: 1px solid #e9e6ff;
+        border-radius: 20px;
+    }
+
+    .feed-welcome h1 {
+        font-size: 28px;
+        margin: 0 0 8px;
+    }
+
+    .feed-welcome p {
+        color: #777b90;
+        font-size: 14px;
+        margin: 0 0 18px;
+    }
+
+    .create-prompt {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 15px;
+        background: #fff;
+        border: 1px solid #eaebf2;
+        border-radius: 17px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 24px rgba(35, 38, 80, .04);
+    }
+
+    .create-prompt-text {
+        flex: 1;
+        min-width: 0;
+        color: #85889a;
+        font-size: 13px;
+    }
+
+    .create-prompt .btn {
+        flex-shrink: 0;
+    }
+
+    .feed-section-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0 0 15px;
+    }
+
+    .feed-section-heading h2 {
+        font-size: 20px;
+        margin: 0;
+    }
+
+    .post-card {
+        background: #fff;
+        border: 1px solid #eaebf2;
+        border-radius: 18px;
+        padding: 22px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 24px rgba(35, 38, 80, .045);
+        min-width: 0;
+    }
+
+    .post-user {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+    }
+
+    .post-avatar {
+        width: 46px;
+        height: 46px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #eeedff;
+        border: 2px solid #f0edff;
+    }
+
+    .post-avatar-fallback {
+        display: grid;
+        place-items: center;
+        color: #fff;
+        background: linear-gradient(135deg, #5b5fef, #8b5cf6);
+        font-weight: 800;
+        font-size: 18px;
+    }
+
+    .post-user-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .post-username {
+        display: block;
+        color: #202235;
+        font-size: 14px;
+        font-weight: 750;
+        overflow-wrap: anywhere;
+    }
+
+    .post-time {
+        color: #9699aa;
+        font-size: 11px;
+    }
+
+    .post-content {
+        margin: 19px 0;
+        color: #44465b;
+        font-size: 14px;
+        line-height: 1.9;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .post-divider {
+        border: 0;
+        border-top: 1px solid #f0f0f6;
+        margin: 0 0 14px;
+    }
+
+    .post-action-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .post-action-left {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 9px;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 12px;
+        border: 1px solid #e9e9f2;
+        border-radius: 10px;
+        background: #fff;
+        color: #686b80;
+        font-size: 12px;
+        font-weight: 650;
+        cursor: pointer;
+    }
+
+    .action-btn:hover {
+        background: #f5f3ff;
+        border-color: #dcd8ff;
+        color: #5b5fef;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .action-btn.liked {
+        color: #5b5fef;
+        background: #eeedff;
+        border-color: #dedaff;
+    }
+
+    .delete-btn {
+        background: #fff2f4;
+        border-color: #ffe0e5;
+        color: #d94b68;
+    }
+
+    .delete-btn:hover {
+        background: #ffe3e8;
+        color: #c92c4b;
+    }
+
+    .comment-section {
+        margin-top: 18px;
+        padding-top: 15px;
+        border-top: 1px solid #f0f0f6;
+    }
+
+    .comment-heading {
+        font-size: 13px;
+        font-weight: 750;
+        margin: 0 0 12px;
+    }
+
+    .comment-item {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 12px;
+        align-items: flex-start;
+    }
+
+    .comment-avatar {
+        width: 30px;
+        height: 30px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: #eeedff;
+        color: #5b5fef;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .comment-bubble {
+        flex: 1;
+        min-width: 0;
+        background: #f7f7fc;
+        border-radius: 0 12px 12px 12px;
+        padding: 10px 13px;
+        font-size: 12px;
+        overflow-wrap: anywhere;
+    }
+
+    .comment-author {
+        display: block;
+        color: #292b40;
+        font-weight: 750;
+        margin-bottom: 3px;
+    }
+
+    .comment-content {
+        color: #65677b;
+        white-space: pre-wrap;
+    }
+
+    .comment-form {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-top: 14px;
+    }
+
+    .comment-form input {
+        flex: 1;
+        min-width: 0;
+        margin: 0;
+        padding: 11px 13px;
+        background: #f8f8fc;
+        border: 1px solid #e9e9f2;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+
+    .comment-form button {
+        padding: 11px 14px;
+        flex-shrink: 0;
+    }
+
+    .right-profile {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        margin-bottom: 16px;
+        min-width: 0;
+    }
+
+    .right-profile-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .right-profile-info strong {
+        display: block;
+        font-size: 12px;
+        overflow-wrap: anywhere;
+    }
+
+    .right-profile-info span {
+        display: block;
+        font-size: 11px;
+        color: #85889a;
+    }
+
+    .mini-avatar {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #5b5fef, #8b5cf6);
+        color: #fff;
+        font-weight: 750;
+        object-fit: cover;
+    }
+
+    .suggest-link {
+        font-size: 11px;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+    .sidebar-note {
+        color: #9295a6;
+        font-size: 11px;
+        line-height: 1.8;
+    }
+
+    .empty-feed {
+        background: #fff;
+        border: 1px solid #eaebf2;
+        border-radius: 18px;
+        padding: 45px 24px;
+        text-align: center;
+        box-shadow: 0 5px 24px rgba(35, 38, 80, .04);
+    }
+
+    .empty-feed-icon {
+        display: inline-grid;
+        place-items: center;
+        width: 70px;
+        height: 70px;
+        border-radius: 22px;
+        background: #eeedff;
+        font-size: 30px;
+        margin-bottom: 15px;
+    }
+
+    .empty-feed h3 {
+        margin: 0 0 8px;
+    }
+
+    .empty-feed p {
+        color: #85889a;
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 1200px) {
+        .feed-layout {
+            grid-template-columns: 200px minmax(0, 620px);
+        }
+
+        .feed-rightbar {
+            display: none;
+        }
+    }
+
+    @media (max-width: 800px) {
+        .feed-layout {
+            display: block;
+        }
+
+        .feed-sidebar {
+            display: none;
+        }
+
+        .feed-welcome {
+            padding: 21px;
+        }
+
+        .feed-welcome h1 {
+            font-size: 24px;
+        }
+
+        .post-card {
+            padding: 17px;
+        }
+
+        .create-prompt {
+            padding: 12px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .post-action-row {
+            align-items: flex-start;
+        }
+
+        .action-btn {
+            padding: 8px 10px;
+            font-size: 11px;
+        }
+
+        .create-prompt-text {
+            font-size: 12px;
+        }
+
+        .create-prompt .btn {
+            padding: 9px 11px;
+            font-size: 11px;
+        }
+    }
+
+    .post-media {
+        margin: 14px 0 19px;
+        overflow: hidden;
+        border: 1px solid #eaebf2;
+        border-radius: 14px;
+        background: #f7f7fc;
+    }
+
+    .post-media img {
+        display: block;
+        width: 100%;
+        max-height: 650px;
+        object-fit: contain;
+        background: #f7f7fc;
+    }
+
+    .post-media video {
+        display: block;
+        width: 100%;
+        max-height: 650px;
+        background: #171725;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="feed-layout">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="feed-sidebar">
+
+        <div class="sidebar-card">
+            <h3 class="sidebar-title">Menu</h3>
+
+            <a class="side-link selected" href="{% url 'feed' %}">
+                <span class="side-icon">🏠</span> Home Feed
+            </a>
+
+            <a class="side-link" href="{% url 'profile' %}">
+                <span class="side-icon">👤</span> My Profile
+            </a>
+
+            <a class="side-link" href="{% url 'discover_users' %}">
+                <span class="side-icon">🔎</span> Discover People
+            </a>
+
+            <a class="side-link" href="{% url 'create_post' %}">
+                <span class="side-icon">✍️</span> Create Post
+            </a>
+
+            <a class="side-link" href="{% url 'edit_profile' %}">
+                <span class="side-icon">⚙️</span> Edit Profile
+            </a>
+        </div>
+
+        <div class="sidebar-card">
+            <h3 class="sidebar-title">Your community 💜</h3>
+            <p class="sidebar-note">
+                Connect with people, share your thoughts, and keep up
+                with the people you follow.
+            </p>
+
+            <a class="btn btn-secondary"
+               href="{% url 'discover_users' %}"
+               style="width:100%">
+                Find People
+            </a>
+        </div>
+
+    </aside>
+
+    <!-- MAIN FEED -->
+    <section class="feed-main">
+
+        <div class="feed-welcome">
+            <h1>Your community, your space ✨</h1>
+            <p>
+                Welcome back, {{ request.user.username }}!
+                See what's happening in your community.
+            </p>
+
+            <a href="{% url 'create_post' %}" class="btn">
+                ＋ Create a Post
+            </a>
+        </div>
+
+        <div class="create-prompt">
+            <div class="mini-avatar">
+                {{ request.user.username|first|upper }}
+            </div>
+
+            <div class="create-prompt-text">
+                What's on your mind, {{ request.user.username }}?
+            </div>
+
+            <a href="{% url 'create_post' %}" class="btn">
+                Write Post
+            </a>
+        </div>
+
+        <div class="feed-section-heading">
+            <h2>Latest Posts</h2>
+            <span class="muted">Your feed 💜</span>
+        </div>
+
+        {% for post in posts %}
+
+            <article class="post-card">
+
+                <!-- Post author -->
+                <div class="post-header">
+                    <div class="post-user">
+
+                        {% if post.author.profile.profile_picture %}
+                            <img
+                                src="{{ post.author.profile.profile_picture.url }}"
+                                alt="{{ post.author.username }}"
+                                class="post-avatar"
+                            >
+                        {% else %}
+                            <div class="post-avatar post-avatar-fallback">
+                                {{ post.author.username|first|upper }}
+                            </div>
+                        {% endif %}
+
+                        <div class="post-user-info">
+                            <a
+                                class="post-username"
+                                href="{% url 'user_profile' post.author.username %}"
+                            >
+                                {{ post.author.username }}
+                            </a>
+
+                            <span class="post-time">
+                                {{ post.created_at|date:"M d, Y" }}
+                                · {{ post.created_at|time:"g:i A" }}
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Post content -->
+                <!-- Post text -->
+                {% if post.content %}
+                    <div class="post-content">{{ post.content }}</div>
+                {% endif %}
+
+                <!-- Post image -->
+                {% if post.image %}
+                    <div class="post-media">
+                        <img
+                            src="{{ post.image.url }}"
+                            alt="Image shared by {{ post.author.username }}"
+                            loading="lazy"
+                        >
+                    </div>
+                {% endif %}
+
+                <!-- Post video -->
+                {% if post.video %}
+                    <div class="post-media">
+                        <video
+                            controls
+                            playsinline
+                            preload="metadata"
+                            aria-label="Video shared by {{ post.author.username }}"
+                        >
+                            <source src="{{ post.video.url }}">
+                            Your browser does not support video playback.
+                        </video>
+                    </div>
+                {% endif %}
+
+                <!-- Likes and comment count -->
+                <div class="post-meta" style="margin-bottom:14px">
+                    💜 {{ post.likes.count }}
+                    {% if post.likes.count == 1 %}like{% else %}likes{% endif %}
+                    &nbsp; · &nbsp;
+                    💬 {{ post.comments.count }}
+                    {% if post.comments.count == 1 %}comment{% else %}comments{% endif %}
+                </div>
+
+                <hr class="post-divider">
+
+                <!-- Post actions -->
+                <div class="post-action-row">
+
+                    <div class="post-action-left">
+
+                        <form
+                            method="post"
+                            action="{% url 'toggle_like' post.id %}"
+                            style="margin:0"
+                        >
+                            {% csrf_token %}
+
+                            {% if post.id in liked_post_ids %}
+                                <button type="submit" class="action-btn liked">
+                                    💜 Liked
+                                </button>
+                            {% else %}
+                                <button type="submit" class="action-btn">
+                                    ♡ Like
+                                </button>
+                            {% endif %}
+                        </form>
+
+                        <a
+                            href="#comments-{{ post.id }}"
+                            class="action-btn"
+                            style="text-decoration:none"
+                        >
+                            💬 Comment
+                        </a>
+
+                    </div>
+
+                    {% if post.author_id == request.user.id %}
+                        <form
+                            method="post"
+                            action="{% url 'delete_post' post.id %}"
+                            style="margin:0"
+                            onsubmit="return confirm('Are you sure you want to delete this post?');"
+                        >
+                            {% csrf_token %}
+                            <button type="submit" class="action-btn delete-btn">
+                                🗑 Delete
+                            </button>
+                        </form>
+                    {% endif %}
+
+                </div>
+
+                <!-- Comments -->
+                <div class="comment-section" id="comments-{{ post.id }}">
+
+                    <h4 class="comment-heading">Comments</h4>
+
+                    {% for comment in post.comments.all %}
+
+                        <div class="comment-item">
+
+                            <div class="comment-avatar">
+                                {{ comment.author.username|first|upper }}
+                            </div>
+
+                            <div class="comment-bubble">
+                                <a
+                                    href="{% url 'user_profile' comment.author.username %}"
+                                    class="comment-author"
+                                >
+                                    {{ comment.author.username }}
+                                </a>
+
+                                <div class="comment-content">{{ comment.content }}</div>
+                            </div>
+
+                        </div>
+
+                    {% empty %}
+
+                        <p class="muted" style="font-size:12px">
+                            No comments yet. Start the conversation!
+                        </p>
+
+                    {% endfor %}
+
+                    <form
+                        method="post"
+                        action="{% url 'add_comment' post.id %}"
+                        class="comment-form"
+                    >
+                        {% csrf_token %}
+
+                        <input
+                            type="text"
+                            name="content"
+                            placeholder="Write a comment..."
+                            aria-label="Write a comment"
+                            maxlength="1000"
+                            required
+                        >
+
+                        <button type="submit">Send ↗</button>
+                    </form>
+
+                </div>
+
+            </article>
+
+        {% empty %}
+
+            <div class="empty-feed">
+                <div class="empty-feed-icon">💜</div>
+
+                <h3>Your feed is just getting started!</h3>
+
+                <p>
+                    Follow some people to see their posts here,
+                    or share something with your community.
+                </p>
+
+                <a href="{% url 'discover_users' %}" class="btn btn-secondary">
+                    🔎 Discover People
+                </a>
+
+                <a href="{% url 'create_post' %}" class="btn">
+                    ＋ Create a Post
+                </a>
+            </div>
+
+        {% endfor %}
+
+    </section>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="feed-rightbar">
+
+        <div class="sidebar-card">
+            <h3 class="sidebar-title">Your profile</h3>
+
+            <div class="right-profile">
+                {% if request.user.profile.profile_picture %}
+                    <img
+                        src="{{ request.user.profile.profile_picture.url }}"
+                        alt="Your profile picture"
+                        class="mini-avatar"
+                    >
+                {% else %}
+                    <div class="mini-avatar">
+                        {{ request.user.username|first|upper }}
+                    </div>
+                {% endif %}
+
+                <div class="right-profile-info">
+                    <strong>{{ request.user.username }}</strong>
+                    <span>SocialConnect member</span>
+                </div>
+            </div>
+
+            <a href="{% url 'profile' %}" class="btn btn-secondary"
+               style="width:100%">
+                View My Profile
+            </a>
+        </div>
+
+        <div class="sidebar-card">
+            <h3 class="sidebar-title">Grow your community</h3>
+
+            <p class="sidebar-note">
+                Great conversations start with new connections.
+                Discover people and follow their updates.
+            </p>
+
+            <a href="{% url 'discover_users' %}" class="btn"
+               style="width:100%">
+                🔎 Discover People
+            </a>
+        </div>
+
+        <div class="sidebar-card">
+            <h3 class="sidebar-title">About SocialConnect</h3>
+            <p class="sidebar-note">
+                A place to share ideas, connect with people,
+                and be part of a community.
+            </p>
+            <span class="sidebar-note">Made with 💜</span>
+        </div>
+
+    </aside>
+
+</div>
+
+{% endblock %}

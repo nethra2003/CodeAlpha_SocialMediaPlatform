@@ -1,0 +1,397 @@
+{% extends "social/base.html" %}
+
+{% block title %}Discover People | SocialConnect{% endblock %}
+
+{% block extra_css %}
+<style>
+    .discover-container {
+        max-width: 1050px;
+        margin: 0 auto;
+    }
+
+    .discover-hero {
+        padding: 30px;
+        margin-bottom: 24px;
+        border: 1px solid #e9e6ff;
+        border-radius: 22px;
+        background: linear-gradient(120deg, #fff 25%, #f0edff);
+    }
+
+    .discover-hero h1 {
+        font-size: 30px;
+        margin: 0 0 8px;
+    }
+
+    .discover-hero p {
+        margin: 0 0 20px;
+        color: #777b90;
+        font-size: 14px;
+    }
+
+    .search-form {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        max-width: 620px;
+        margin: 0;
+    }
+
+    .search-form input {
+        flex: 1;
+        min-width: 0;
+        margin: 0;
+        background: #fff;
+    }
+
+    .search-form button {
+        flex-shrink: 0;
+    }
+
+    .discover-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 18px;
+    }
+
+    .discover-heading h2 {
+        margin: 0;
+        font-size: 21px;
+    }
+
+    .discover-heading span {
+        color: #85889a;
+        font-size: 12px;
+    }
+
+    .people-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .person-card {
+        background: #fff;
+        border: 1px solid #eaebf2;
+        border-radius: 18px;
+        padding: 24px 20px;
+        text-align: center;
+        box-shadow: 0 5px 24px rgba(35, 38, 80, .045);
+        transition: transform .2s, box-shadow .2s;
+        min-width: 0;
+    }
+
+    .person-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 28px rgba(35, 38, 80, .08);
+    }
+
+    .person-avatar {
+        width: 78px;
+        height: 78px;
+        margin: 0 auto 13px;
+        border-radius: 50%;
+        border: 4px solid #f0edff;
+        object-fit: cover;
+        background: #eeedff;
+    }
+
+    .person-avatar-fallback {
+        display: grid;
+        place-items: center;
+        color: #fff;
+        background: linear-gradient(135deg, #5b5fef, #8b5cf6);
+        font-size: 28px;
+        font-weight: 800;
+    }
+
+    .person-name {
+        font-size: 16px;
+        font-weight: 800;
+        margin: 0 0 3px;
+        overflow-wrap: anywhere;
+    }
+
+    .person-name a {
+        color: #202235;
+    }
+
+    .person-name a:hover {
+        color: #5b5fef;
+    }
+
+    .person-handle {
+        color: #9295a6;
+        font-size: 12px;
+        margin-bottom: 12px;
+        overflow-wrap: anywhere;
+    }
+
+    .person-bio {
+        min-height: 43px;
+        margin: 0 0 16px;
+        color: #66697d;
+        font-size: 12px;
+        line-height: 1.7;
+        overflow-wrap: anywhere;
+    }
+
+    .person-stats {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        padding: 13px 0;
+        margin-bottom: 15px;
+        border-top: 1px solid #f0f0f6;
+        border-bottom: 1px solid #f0f0f6;
+    }
+
+    .person-stat strong {
+        display: block;
+        color: #292b40;
+        font-size: 15px;
+    }
+
+    .person-stat span {
+        display: block;
+        color: #9295a6;
+        font-size: 10px;
+    }
+
+    .person-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .person-actions a,
+    .person-actions form {
+        flex: 1;
+        min-width: 0;
+        margin: 0;
+    }
+
+    .person-actions .btn,
+    .person-actions button {
+        width: 100%;
+        padding: 10px 8px;
+        font-size: 11px;
+        white-space: nowrap;
+    }
+
+    .discover-empty {
+        background: white;
+        border: 1px solid #eaebf2;
+        border-radius: 18px;
+        padding: 45px 20px;
+        text-align: center;
+        grid-column: 1 / -1;
+    }
+
+    .discover-empty-icon {
+        font-size: 42px;
+        margin-bottom: 12px;
+    }
+
+    @media (max-width: 900px) {
+        .people-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 560px) {
+        .discover-hero {
+            padding: 21px;
+        }
+
+        .discover-hero h1 {
+            font-size: 25px;
+        }
+
+        .people-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .person-card {
+            padding: 23px;
+        }
+
+        .search-form {
+            flex-wrap: wrap;
+        }
+
+        .search-form input {
+            flex-basis: 100%;
+        }
+
+        .discover-heading {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 5px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="discover-container">
+
+    <section class="discover-hero">
+        <h1>Discover Your Community 💜</h1>
+        <p>
+            Find interesting people, build connections, and see what
+            everyone is sharing.
+        </p>
+
+        <form method="get"
+              action="{% url 'discover_users' %}"
+              class="search-form">
+
+            <input
+                type="search"
+                name="q"
+                placeholder="Search by username..."
+                value="{{ search_query }}"
+                aria-label="Search users"
+            >
+
+            <button type="submit">🔎 Search</button>
+
+            {% if search_query %}
+                <a href="{% url 'discover_users' %}"
+                   class="btn btn-secondary">
+                    Clear
+                </a>
+            {% endif %}
+
+        </form>
+    </section>
+
+    <div class="discover-heading">
+        <h2>
+            {% if search_query %}
+                Search Results
+            {% else %}
+                People You Can Follow
+            {% endif %}
+        </h2>
+
+        <span>
+            {% if search_query %}
+                Results for "{{ search_query }}"
+            {% else %}
+                Make new connections
+            {% endif %}
+        </span>
+    </div>
+
+    <div class="people-grid">
+
+        {% for person in users %}
+
+            <article class="person-card">
+
+                {% if person.profile.profile_picture %}
+                    <img
+                        src="{{ person.profile.profile_picture.url }}"
+                        alt="{{ person.username }}"
+                        class="person-avatar"
+                    >
+                {% else %}
+                    <div class="person-avatar person-avatar-fallback">
+                        {{ person.username|first|upper }}
+                    </div>
+                {% endif %}
+
+                <h3 class="person-name">
+                    <a href="{% url 'user_profile' person.username %}">
+                        {{ person.username }}
+                    </a>
+                </h3>
+
+                <div class="person-handle">
+                    @{{ person.username }}
+                </div>
+
+                <p class="person-bio">
+                    {% if person.profile.bio %}
+                        {{ person.profile.bio|truncatechars:85 }}
+                    {% else %}
+                        No bio added yet.
+                    {% endif %}
+                </p>
+
+                <div class="person-stats">
+                    <div class="person-stat">
+                        <strong>{{ person.followers.count }}</strong>
+                        <span>Followers</span>
+                    </div>
+
+                    <div class="person-stat">
+                        <strong>{{ person.following.count }}</strong>
+                        <span>Following</span>
+                    </div>
+                </div>
+
+                <div class="person-actions">
+
+                    <a class="btn btn-secondary"
+                       href="{% url 'user_profile' person.username %}">
+                        View Profile
+                    </a>
+
+                    <form method="post"
+                          action="{% url 'toggle_follow' person.username %}">
+                        {% csrf_token %}
+
+                        {% if person.id in following_ids %}
+                            <button type="submit" class="btn-secondary">
+                                Following
+                            </button>
+                        {% else %}
+                            <button type="submit">
+                                ＋ Follow
+                            </button>
+                        {% endif %}
+                    </form>
+
+                </div>
+
+            </article>
+
+        {% empty %}
+
+            <div class="discover-empty">
+                <div class="discover-empty-icon">🔎</div>
+
+                <h3>
+                    {% if search_query %}
+                        No users found
+                    {% else %}
+                        No people to discover yet
+                    {% endif %}
+                </h3>
+
+                <p class="muted">
+                    {% if search_query %}
+                        Try a different username or clear your search.
+                    {% else %}
+                        Other registered users will appear here.
+                    {% endif %}
+                </p>
+
+                {% if search_query %}
+                    <a href="{% url 'discover_users' %}" class="btn">
+                        Clear Search
+                    </a>
+                {% endif %}
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}
